@@ -7,11 +7,11 @@ It adds a PyTorch backend to CUQIpy, allowing the user to use the PyTorch API to
 It also links to the [Pyro](https://pyro.ai/) No U-Turn Hamiltonian Monte Carlo sampler (NUTS) for efficient sampling from the joint posterior.
 
 ## Installation
-First install [PyTorch](https://pytorch.org/), then install CUQIpy-PyTorch using pip:
+For optimal performance consider installing [PyTorch](https://pytorch.org/) using conda, then install CUQIpy-PyTorch using pip:
 ```bash
 pip install cuqipy-pytorch
 ```
-If CUQIpy or Pyro are not installed, they will be installed automatically.
+If PyTorch, Pyro or CUQIpy are not installed, they will be installed automatically from the above command.
 
 ## Quickstart
 Example for sampling from the [eight schools model](https://github.com/blei-lab/edward/blob/master/notebooks/eight_schools.ipynb):
