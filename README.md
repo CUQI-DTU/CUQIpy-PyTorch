@@ -14,6 +14,20 @@ pip install cuqipy-pytorch
 If CUQIpy or Pyro are not installed, they will be installed automatically.
 
 ## Quickstart
+Example for sampling from the [eight schools model](https://github.com/blei-lab/edward/blob/master/notebooks/eight_schools.ipynb):
+
+$$
+\begin{align*}
+    \mu &\sim \mathcal{N}(0, 10^2)\\
+    \tau &\sim \log\mathcal{N}(5, 1)\\
+    \boldsymbol \theta' &\sim \mathcal{N}(\mathbf{0}, \mathbf{I}_m)\\
+    \boldsymbol \theta &= \mu + \tau \boldsymbol \theta'\\
+    \mathbf{y} &\sim \mathcal{N}(\boldsymbol \theta, \boldsymbol \sigma^2 \mathbf{I}_m)
+\end{align*}
+$$
+
+where $\mathbf{y}\in\mathbb{R}^m$ and $\boldsymbol \sigma\in\mathbb{R}^m$ are observed data.
+
 ```python
 import torch as xp
 from cuqi.distribution import JointDistribution
