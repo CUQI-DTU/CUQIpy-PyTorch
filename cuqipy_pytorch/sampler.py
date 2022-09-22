@@ -14,7 +14,10 @@ class NUTS:
         if NUTS_kwargs is None:
             NUTS_kwargs = {}
 
-        if isinstance(target, JointDistribution):
+        if isinstance(target, StackedJointDistribution):
+            self.joint = JointDistribution(*target._densities)
+            self.target = target
+        elif isinstance(target, JointDistribution):
             self.joint = target
             self.target = StackedJointDistribution(*target._densities)
         elif isinstance(target, Posterior):
