@@ -6,6 +6,8 @@ on:
       - main
   pull_request:
   workflow_dispatch:
+  schedule: # Run every 3 hours starting at 10 minutes past the hour to avoid congestion (runs only on main branch).
+    - cron: '10 */3 * * *'
 
 jobs:
   build:
