@@ -6,6 +6,8 @@ on:
       - main
   pull_request:
   workflow_dispatch:
+  schedule: # Run every 3 hours starting at 10 minutes past the hour to avoid congestion (runs only on main branch).
+    - cron: '10 */3 * * *'
 
 jobs:
   build:
@@ -25,6 +27,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
+      - name: Install pre-release of CUQIpy # We install latest pre-release version of CUQIpy to catch upstream bugs early
+        run: |
+          pip install -i https://test.pypi.org/simple/ cuqipy --pre --upgrade
       - name: Lint with flake8
         run: |
           # stop the build if there are Python syntax errors or undefined names
