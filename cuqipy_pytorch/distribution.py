@@ -128,7 +128,9 @@ class LogGaussian(Distribution):
                 mean = mean*torch.ones(self.dim)
             if isinstance(cov, numbers.Number):
                 cov = cov*torch.ones(self.dim)
-            self._dist = torch.distributions.LogNormal(mean, cov)
+
+            if torch.is_tensor(mean) and torch.is_tensor(cov):
+                self._dist = torch.distributions.LogNormal(mean, cov)
 
     def logpdf(self, value):
         if not torch.is_tensor(value):
