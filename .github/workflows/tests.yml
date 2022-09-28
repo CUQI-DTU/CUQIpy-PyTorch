@@ -8,6 +8,8 @@ on:
   workflow_dispatch:
   schedule: # Run every 3 hours starting at 10 minutes past the hour to avoid congestion (runs only on main branch).
     - cron: '10 */3 * * *'
+  repository_dispatch: # Triggered by the "run plugin tests" workflow in the main repo (runs only on main branch).
+    types: [run-plugin-tests]
 
 jobs:
   build:
