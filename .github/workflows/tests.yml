@@ -31,8 +31,7 @@ jobs:
           pip install -r requirements-dev.txt
       - name: Install pre-release of CUQIpy # We install latest pre-release version of CUQIpy to catch upstream bugs early
         run: |
-          pip uninstall cuqipy -y
-          pip install -i https://test.pypi.org/simple/ cuqipy --pre --upgrade
+          pip install -i https://test.pypi.org/simple/ cuqipy --pre --upgrade --no-cache-dir
       - name: Lint with flake8
         run: |
           # stop the build if there are Python syntax errors or undefined names
