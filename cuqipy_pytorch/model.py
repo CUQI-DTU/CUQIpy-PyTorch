@@ -26,9 +26,12 @@ def add_to_autograd(model: Model):
             grad_input = model.gradient(numpy_grad_output, numpy_input)
             return input.new(grad_input)
 
-    torch_forward = CustomFunction.apply
+    torch_forward = lambda *args: CustomFunction.apply(*args)
 
     # Add to cuqi model
     torch_model = Model(torch_forward, int(model.range_dim), int(model.domain_dim))
+
+    # Set parameter name
+    torch_model._non_default_args = model._non_default_args
 
     return torch_model
