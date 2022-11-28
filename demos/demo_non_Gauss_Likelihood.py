@@ -23,7 +23,7 @@ B = lambda u: xp.log(u**2 + 1) + xp.sin(u) # Contrived example
 
 # Model 1
 x = Gaussian(xp.zeros(n), 0.1)                  # x ~ N(0, 1)
-y = Cauchy(location=A, scale=0.1)               # y ~ Cauchy(Ax, 0.1)
+y = Cauchy(location=A(x), scale=0.1)               # y ~ Cauchy(Ax, 0.1)
 J1 = cuqi.distribution.JointDistribution(x, y)
 
 # Model 2
