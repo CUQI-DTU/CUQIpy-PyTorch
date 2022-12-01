@@ -395,3 +395,144 @@ class Gaussian2(Distribution):
             Q = self(v2).logpdf(v1) # Forward pass
             Q.backward()            # Backward pass
             return v2.grad
+
+class Laplace(Distribution):
+    """Laplace distribution constructed via torch.distributions.Laplace.
+
+    Creates a Laplace distribution with location `loc` and scale `scale`. The pdf is given by
+
+    .. math::
+
+        f(x) = \\frac{1}{2 \\sigma} \\exp \\left( - \\frac{|x - \\mu|}{\\sigma} \\right)
+
+    where :math:`\\mu` is the location and :math:`\\sigma` is the scale.
+    
+    Parameters
+    ----------
+    loc : float, ndarray or torch.tensor
+        Location parameter
+        
+    scale : float, ndarray or torch.tensor  
+    
+    """
+
+    def __init__(self, location, scale, is_symmetric=True, **kwargs):
+        super().__init__(is_symmetric=is_symmetric, **kwargs) 
+        self.location = location
+        self.scale = scale
+
+    @property
+    def location(self):
+        return self._location
+
+    @location.setter
+    def location(self, value):
+        self._location = value
+        self._set_dist()
+    
+    @property
+    def scale(self):
+        return self._scale
+
+    @scale.setter
+    def scale(self, value):
+        self._scale = value
+        self._set_dist()
+
+    def _set_dist(self):
+        """ Set the pytorch distribution if both values are specified """
+        if hasattr(self, '_location') and hasattr(self, '_scale'):
+
+            # Define location value
+            loc = self.location
+            if isinstance(loc, numbers.Number):
+                loc = loc*torch.ones(self.dim)
+            if isinstance(loc, np.ndarray):
+                loc = torch.tensor(loc)
+
+            # Define scale value
+            scale = self._scale
+            if isinstance(scale, numbers.Number):
+                scale = scale*torch.ones(self.dim)
+            if isinstance(scale, np.ndarray):
+                scale = torch.tensor(scale)
+
+            # If both are tensors we create dist
+            if torch.is_tensor(loc) and torch.is_tensor(scale):
+                self._dist = torch.distributions.Laplace(loc, scale)
+
+    def logpdf(self, value):
+        return torch.sum(self._dist.log_prob(value))
+
+    def _sample(self, n):
+        return self._dist.sample(torch.Size((n,)))
+
+class Cauchy(Distribution):
+    """Cauchy distribution constructed via torch.distributions.Cauchy.
+
+    Creates a Cauchy distribution with location `loc` and scale `scale`. The pdf is given by
+
+    .. math::
+
+        f(x) = \\frac{1}{\\pi \\sigma (1 + ((x - \\mu)/\\sigma)^2)}
+
+    where :math:`\\mu` is the location and :math:`\\sigma` is the scale.
+
+    Parameters
+    ----------
+    loc : float, ndarray or torch.tensor
+
+    scale : float, ndarray or torch.tensor
+
+    """
+
+    def __init__(self, location, scale, is_symmetric=True, **kwargs):
+        super().__init__(is_symmetric=is_symmetric, **kwargs) 
+        self.location = location
+        self.scale = scale
+
+    @property
+    def location(self):
+        return self._location
+
+    @location.setter
+    def location(self, value):
+        self._location = value
+        self._set_dist()
+    
+    @property
+    def scale(self):
+        return self._scale
+
+    @scale.setter
+    def scale(self, value):
+        self._scale = value
+        self._set_dist()
+
+    def _set_dist(self):
+        """ Set the pytorch distribution if both values are specified """
+        if hasattr(self, '_location') and hasattr(self, '_scale'):
+
+            # Define location value
+            loc = self.location
+            if isinstance(loc, numbers.Number):
+                loc = loc*torch.ones(self.dim)
+            if isinstance(loc, np.ndarray):
+                loc = torch.tensor(loc)
+
+            # Define scale value
+            scale = self._scale
+            if isinstance(scale, numbers.Number):
+                scale = scale*torch.ones(self.dim)
+            if isinstance(scale, np.ndarray):
+                scale = torch.tensor(scale)
+
+            # If both are tensors we create dist
+            if torch.is_tensor(loc) and torch.is_tensor(scale):
+                self._dist = torch.distributions.Cauchy(loc, scale)
+
+    def logpdf(self, value):
+        return torch.sum(self._dist.log_prob(value))
+
+    def _sample(self, n):
+        return self._dist.sample(torch.Size((n,)))
