@@ -1,4 +1,12 @@
-# %%
+"""
+NUTS sampling with non-Gaussian likelihood
+==========================================
+Demonstrates how to use NUTS sampling with a non-Gaussian likelihoods.
+
+Also demonstrates how to add CUQIpy models to the PyTorch autograd engine.
+"""
+
+# %% Imports
 import torch as xp
 import cuqi
 
@@ -12,7 +20,7 @@ n = 50
 # Testproblem
 TP = cuqi.testproblem.Deconvolution1D(dim=n)
 
-# CUQIpy model added to autograd framework. y = Ax
+# CUQIpy model and data added to autograd framework. y = Ax
 A = add_to_autograd(TP.model)
 y_obs = xp.as_tensor(TP.data)
 
@@ -22,7 +30,7 @@ B = lambda u: xp.log(u**2 + 1) + xp.sin(u) # Contrived example
 # %% Bayesian models (non-Gaussian likelihoods)
 
 # Model 1
-x = Gaussian(xp.zeros(n), 0.1)                  # x ~ N(0, 1)
+x = Gaussian(xp.zeros(n), 0.1)                     # x ~ N(0, 1)
 y = Cauchy(location=A(x), scale=0.1)               # y ~ Cauchy(Ax, 0.1)
 J1 = cuqi.distribution.JointDistribution(x, y)
 
@@ -32,9 +40,11 @@ d = Laplace(location=B, scale=0.1*xp.ones(n))   # d ~ Laplace(Bu, 0.1)
 J2 = cuqi.distribution.JointDistribution(u, d)
 
 # %% Posteriors
+print("Posterior 1:")
 P1 = J1(y=y_obs)
 print(P1)
 
+print("Posterior 2:")
 P2 = J2(d=xp.ones(n))
 print(P2)
 
@@ -42,22 +52,35 @@ print(P2)
 print(P1.logpdf(x=xp.ones(n)))
 print(P2.logpdf(u=xp.ones(n)))
 
-# %% Sampling
+# %% Sampling model 2 with NUTS
 
-# A convenience function to sample a Bayesian model
-# It creates the joint and posterior distributions as above.
+samples2 = NUTS(P2).sample(100, 100)
+
+# %% Sampling model 1 with NUTS
+
+samples1 = NUTS(P1).sample(100, 100) 
+
+# %% Compare "Data" (ones) with posterior mean through forward model
+# Value should be close to 1
+print(B(xp.as_tensor(samples2["u"].mean())))
+
+# %% Posterior plot for model 1
+samples1["x"].plot_ci(exact=TP.exactSolution)
+
+# %% Sampling without explicit creation of joint and posterior distributions
+# This is a convenience function that does the same as above.
+# Namely, it creates a joint distribution and posterior distribution
+# and then samples from the posterior distribution using NUTS.
+
 def sample_posterior(*densities, n_samples=500, n_burnin=500, **data):
     """ Sample posterior given by a list of densities. The observations are given as keyword arguments. """
     P = cuqi.distribution.JointDistribution(*densities)
     return NUTS(P(**data)).sample(n_samples, n_burnin)
 
-# %% Model 2 (sampling runs. The example is contrived and only for illustration purposes to show using function)
-samples2 = sample_posterior(u, d, d=xp.ones(n), n_samples=100, n_burnin=100)
-# %% Compare "Data" (ones) with posterior mean through forward model
-print(B(xp.as_tensor(samples2["u"].mean())))
+# %% Example with convenience function
 
-# %% Model 1 (Data had Gaussian noise, but model is Cauchy noise.)
-samples1 = sample_posterior(x, y, y=y_obs, n_samples=200, n_burnin=200)
+samples3 = sample_posterior(x, y, y=y_obs, n_samples=100, n_burnin=100)
 
-# %% Posterior plot for model 1
-samples1["x"].plot_ci(exact=TP.exactSolution)
+# %% Posterior plot for model 1 with samples from convenience function
+samples3["x"].plot_ci(exact=TP.exactSolution)
+# %%
