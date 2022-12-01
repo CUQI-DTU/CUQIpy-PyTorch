@@ -442,6 +442,8 @@ class Laplace(Distribution):
             # If both are tensors we create dist
             if torch.is_tensor(loc) and torch.is_tensor(scale):
                 self._dist = torch.distributions.Laplace(loc, scale)
+            else:
+                raise TypeError(f'Unable to create distribution from location {loc} and scale {scale}. Must be able to convert to torch tensors.')
 
     def logpdf(self, value):
         return torch.sum(self._dist.log_prob(value))
@@ -495,7 +497,9 @@ class Cauchy(Distribution):
             # If both are tensors we create dist
             if torch.is_tensor(loc) and torch.is_tensor(scale):
                 self._dist = torch.distributions.Cauchy(loc, scale)
-
+            else:
+                raise TypeError(f'Unable to create distribution from location {loc} and scale {scale}. Must be able to convert to torch tensors.')
+                
     def logpdf(self, value):
         return torch.sum(self._dist.log_prob(value))
 
