@@ -397,6 +397,24 @@ class Gaussian2(Distribution):
             return v2.grad
 
 class Laplace(Distribution):
+    """Laplace distribution constructed via torch.distributions.Laplace.
+
+    Creates a Laplace distribution with location `loc` and scale `scale`. The pdf is given by
+
+    .. math::
+
+        f(x) = \\frac{1}{2 \\sigma} \\exp \\left( - \\frac{|x - \\mu|}{\\sigma} \\right)
+
+    where :math:`\\mu` is the location and :math:`\\sigma` is the scale.
+    
+    Parameters
+    ----------
+    loc : float, ndarray or torch.tensor
+        Location parameter
+        
+    scale : float, ndarray or torch.tensor  
+    
+    """
 
     def __init__(self, location, scale, is_symmetric=True, **kwargs):
         super().__init__(is_symmetric=is_symmetric, **kwargs) 
@@ -452,6 +470,23 @@ class Laplace(Distribution):
         return self._dist.sample(torch.Size((n,)))
 
 class Cauchy(Distribution):
+    """Cauchy distribution constructed via torch.distributions.Cauchy.
+
+    Creates a Cauchy distribution with location `loc` and scale `scale`. The pdf is given by
+
+    .. math::
+
+        f(x) = \\frac{1}{\\pi \\sigma (1 + ((x - \\mu)/\\sigma)^2)}
+
+    where :math:`\\mu` is the location and :math:`\\sigma` is the scale.
+
+    Parameters
+    ----------
+    loc : float, ndarray or torch.tensor
+
+    scale : float, ndarray or torch.tensor
+
+    """
 
     def __init__(self, location, scale, is_symmetric=True, **kwargs):
         super().__init__(is_symmetric=is_symmetric, **kwargs) 
@@ -499,7 +534,7 @@ class Cauchy(Distribution):
                 self._dist = torch.distributions.Cauchy(loc, scale)
             else:
                 raise TypeError(f'Unable to create distribution from location {loc} and scale {scale}. Must be able to convert to torch tensors.')
-                
+
     def logpdf(self, value):
         return torch.sum(self._dist.log_prob(value))
 
