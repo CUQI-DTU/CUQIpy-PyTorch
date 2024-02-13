@@ -97,7 +97,7 @@ class Uniform(Distribution):
     def _sample(self, n):
         return self._dist.sample(torch.Size((n,)))
 
-class LogGaussian(Distribution):
+class Lognormal(Distribution):
     def __init__(self, mean, cov, is_symmetric=False, **kwargs):
         super().__init__(is_symmetric=is_symmetric, **kwargs) 
         self.mean = mean

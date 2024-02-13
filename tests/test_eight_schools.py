@@ -1,6 +1,6 @@
 import torch as xp
 from cuqi.distribution import JointDistribution
-from cuqipy_pytorch.distribution import Gaussian, LogGaussian
+from cuqipy_pytorch.distribution import Gaussian, Lognormal
 from cuqipy_pytorch.sampler import NUTS
 
 def test_eight_schools_NUTS():
@@ -12,7 +12,7 @@ def test_eight_schools_NUTS():
 
     # Bayesian model
     μ     = Gaussian(0, 10**2)
-    τ     = LogGaussian(5, 1)
+    τ     = Lognormal(5, 1)
     θp    = Gaussian(xp.zeros(8), 1)
     θ     = lambda μ, τ, θp: μ+τ*θp
     y     = Gaussian(θ, cov=σ_obs**2)
