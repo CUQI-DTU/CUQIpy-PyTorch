@@ -31,7 +31,7 @@ where $\mathbf{y}\in\mathbb{R}^m$ and $\boldsymbol \sigma\in\mathbb{R}^m$ are ob
 ```python
 import torch as xp
 from cuqi.distribution import JointDistribution
-from cuqipy_pytorch.distribution import Gaussian, LogGaussian
+from cuqipy_pytorch.distribution import Gaussian, Lognormal
 from cuqipy_pytorch.sampler import NUTS
 
 # Observations
@@ -40,7 +40,7 @@ y_obs = xp.tensor([28, 8, -3,  7, -1, 1,  18, 12], dtype=xp.float32)
 
 # Bayesian model
 μ     = Gaussian(0, 10**2)
-τ     = LogGaussian(5, 1)
+τ     = Lognormal(5, 1)
 θp    = Gaussian(xp.zeros(8), 1)
 θ     = lambda μ, τ, θp: μ+τ*θp
 y     = Gaussian(θ, cov=σ_obs**2)
