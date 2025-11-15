@@ -40,7 +40,4 @@ def add_to_autograd(model: Model):
     ## Add to cuqi model
     torch_model = Model(torch_forward, int(model.range_dim), int(model.domain_dim))
 
-    # Set parameter name
-    torch_model._stored_non_default_args = model._non_default_args
-
     return torch_model
