@@ -1,6 +1,7 @@
 from cuqi.model import Model
 from torch.autograd import Function
 from torch.autograd.function import once_differentiable
+from functools import partial
 
 def add_to_autograd(model: Model):
     """ Add given forward model to torch autograd.
@@ -25,13 +26,18 @@ def add_to_autograd(model: Model):
             numpy_input = input.detach().numpy()
             grad_input = model.gradient(numpy_grad_output, numpy_input)
             return input.new(grad_input)
+    
+    ## Create model forward function
+    # Parameter names for the lambda function
+    non_default_args_str = ", ".join(model._non_default_args)
 
-    torch_forward = lambda *args: CustomFunction.apply(*args)
+    # Create lambda function string
+    lambda_str = "lambda "+non_default_args_str+", func: func("+non_default_args_str+")"
 
-    # Add to cuqi model
+    # Create partial function of the lambda function with func substituted by CustomFunction.apply
+    torch_forward = partial(eval(lambda_str), func=CustomFunction.apply)
+    
+    ## Add to cuqi model
     torch_model = Model(torch_forward, int(model.range_dim), int(model.domain_dim))
-
-    # Set parameter name
-    torch_model._non_default_args = model._non_default_args
 
     return torch_model
